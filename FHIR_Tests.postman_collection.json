@@ -1,0 +1,81 @@
+{
+	"info": {
+		"_postman_id": "ef8d72fd-6089-4d65-a18d-ffb5edd7f032",
+		"name": "FHIR_Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "OWASP",
+			"item": [
+				{
+					"name": "API1:2019 Broken Object Level Authorization",
+					"item": []
+				},
+				{
+					"name": "API2:2019 Broken User Authentication",
+					"item": []
+				},
+				{
+					"name": "API3:2019 Excessive Data Exposure",
+					"item": []
+				},
+				{
+					"name": "API4:2019 Lack of Resources & Rate Limiting",
+					"item": []
+				},
+				{
+					"name": "API5:2019 Broken Function Level Authorization",
+					"item": []
+				},
+				{
+					"name": "API6:2019 Mass Assignment",
+					"item": []
+				},
+				{
+					"name": "API7:2019 Security Misconfiguration",
+					"item": []
+				},
+				{
+					"name": "API8:2019 Injection",
+					"item": []
+				},
+				{
+					"name": "API9:2019 Improper Assets Management",
+					"item": []
+				},
+				{
+					"name": "API10:2019 Insufficient Logging & Monitoring",
+					"item": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_URL",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
