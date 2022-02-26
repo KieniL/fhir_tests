@@ -104,7 +104,8 @@
 							},
 							"response": []
 						}
-					]
+					],
+					"description": "Occurs when authentication mechanism are not implemented correctly and can be abused."
 				},
 				{
 					"name": "API3:2019 Excessive Data Exposure",
@@ -265,23 +266,8 @@
 				},
 				{
 					"name": "API10:2019 Insufficient Logging & Monitoring",
-					"item": [
-						{
-							"name": "New Request Copy 3",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_URL}}",
-									"host": [
-										"{{base_URL}}"
-									]
-								}
-							},
-							"response": []
-						}
-					],
-					"description": "Occurs when logging and monitoring is not complete or integrated into incident response which makes attacks less likely to be discovered."
+					"item": [],
+					"description": "Occurs when logging and monitoring is not complete or integrated into incident response which makes attacks less likely to be discovered.\n\nCan't be tested with Postman so you need to send other requests and then check for logs.\n\nCheck that the requestor is logged with the sourceIP an action which was made with a timestamp.\n\nAdditionally, an incident response and disaster recovery need to be in-place to have a recovery mechanism.\n\nYou also need to make sure that the logging solution does not log only sensitive data which could be extracted by an attacker."
 				}
 			],
 			"description": "Collection of Requests to test OWASP API Top 10 [https://owasp.org/www-project-api-security/](https://owasp.org/www-project-api-security/)"

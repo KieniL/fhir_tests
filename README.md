@@ -27,4 +27,4 @@ Execute scripts/empty_db.sh
 - [ ] Mass Assignment
 - [ ] Injection
 - [ ] Improper Assets Management
-- [ ] Insufficient Logging & Monitoring
+- [x] Insufficient Logging & Monitoring --> Can't be tested with Postman. Only documentation for description and requirements are possible 
