@@ -1,5 +1,5 @@
 #!/bin/sh
-BASE_URL="http://localhost:80/fhir"
+BASE_URL="http://localhost:8080/fhir"
 
 for i in `seq 1 200`; do 
 curl --silent --output /dev/null --show-error --fail\
