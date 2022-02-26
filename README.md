@@ -2,4 +2,4 @@
 
 To create Postman collections the different example Collections can be used from /examples
 
-The collection from the root is based on the dockerimage https://hub.docker.com/r/hapiproject/hapi
+The collection in root is the own developed collection
