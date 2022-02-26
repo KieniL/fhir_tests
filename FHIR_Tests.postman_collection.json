@@ -86,51 +86,205 @@
 				},
 				{
 					"name": "API2:2019 Broken User Authentication",
-					"item": [],
-					"description": "Broken User Authentication occurs when authentication tokens can be compromised to gain access to data or assume other user's identity."
+					"item": [
+						{
+							"name": "New Request",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_URL}}/Patient",
+									"host": [
+										"{{base_URL}}"
+									],
+									"path": [
+										"Patient"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				},
 				{
 					"name": "API3:2019 Excessive Data Exposure",
-					"item": [],
+					"item": [
+						{
+							"name": "New Request Copy",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_URL}}",
+									"host": [
+										"{{base_URL}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
 					"description": "Occurs when object properties are exposed without checking the data sensitivity and rely on the client to filter only the data they need."
 				},
 				{
 					"name": "API4:2019 Lack of Resources & Rate Limiting",
-					"item": [],
-					"description": "Occurs when a client can use a lot of the server resources which then leads to DoS and also makes brute force possible."
+					"item": [
+						{
+							"name": "Retrieve Patients",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Status Code is 429 --> Rate limiting works\", function () {\r",
+											"    pm.response.to.have.status(429) ;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_URL}}/Patient",
+									"host": [
+										"{{base_URL}}"
+									],
+									"path": [
+										"Patient"
+									]
+								},
+								"description": "When retrieving a resources multiple times a rate limiting should be triggered at one to not come to the point where the system resources are depleted.\n\nDon't be confused by the test result since every successfull request will result in a test result error since only 429 and 503 are tested for rate limiting.\n\nSo that means if there are some pass results the Rate limiting works since 429 is returned.\n\nThis was tested with 50 iterations and a rate limit of 10 requests per second."
+							},
+							"response": []
+						}
+					],
+					"description": "Occurs when a client can use a lot of the server resources which then leads to DoS and also makes brute force possible.\n\nTo Test this:\n\nGo to API4:2019 Folder.\n\nClick \"Run\"\n\nSelect Iterations\n\nWait for Testresults to return status 429"
 				},
 				{
 					"name": "API5:2019 Broken Function Level Authorization",
-					"item": [],
+					"item": [
+						{
+							"name": "New Request Copy",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_URL}}",
+									"host": [
+										"{{base_URL}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
 					"description": "Occurs when the access control policy is not clear which then leads to administrative access when not in admin mode."
 				},
 				{
 					"name": "API6:2019 Mass Assignment",
-					"item": [],
+					"item": [
+						{
+							"name": "New Request Copy",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_URL}}",
+									"host": [
+										"{{base_URL}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
 					"description": "Occurs when objects from client requests are not filtered by an allowlist and therefore an attack by modifying object properties is possible."
 				},
 				{
 					"name": "API7:2019 Security Misconfiguration",
-					"item": [],
+					"item": [
+						{
+							"name": "New Request Copy 2",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_URL}}",
+									"host": [
+										"{{base_URL}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
 					"description": "Occurs when the configuration is incompleted of misconfigured (HTTP Headers, HTTP Methods, CORS,...)"
 				},
 				{
 					"name": "API8:2019 Injection",
-					"item": [],
+					"item": [
+						{
+							"name": "New Request Copy",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_URL}}",
+									"host": [
+										"{{base_URL}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
 					"description": "Occurs when input is not validated and makes injectsion like SQL or command injections possible."
 				},
 				{
 					"name": "API9:2019 Improper Assets Management",
-					"item": [],
+					"item": [
+						{
+							"name": "New Request Copy 2",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_URL}}",
+									"host": [
+										"{{base_URL}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
 					"description": "Occurs when endpoints are exposed which doesn't need to be exposed which makes it easier for attackers to gain information."
 				},
 				{
 					"name": "API10:2019 Insufficient Logging & Monitoring",
-					"item": [],
+					"item": [
+						{
+							"name": "New Request Copy 3",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_URL}}",
+									"host": [
+										"{{base_URL}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
 					"description": "Occurs when logging and monitoring is not complete or integrated into incident response which makes attacks less likely to be discovered."
 				}
 			],
-			"description": "Collection of Requests to test OWASP API Top 10 [https://owasp.org/www-project-api-security/](https://owasp.org/www-project-api-security/)\n\n### ToDos:\n[ ] add Possibility to generate Data\n[ ] Add Authentication to testserver"
+			"description": "Collection of Requests to test OWASP API Top 10 [https://owasp.org/www-project-api-security/](https://owasp.org/www-project-api-security/)"
 		}
 	],
 	"event": [
@@ -156,7 +310,7 @@
 	"variable": [
 		{
 			"key": "base_URL",
-			"value": "http://localhost:8080/fhir",
+			"value": "http://localhost:80800/fhir",
 			"type": "string"
 		}
 	]
