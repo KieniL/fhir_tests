@@ -10,45 +10,127 @@
 			"item": [
 				{
 					"name": "API1:2019 Broken Object Level Authorization",
-					"item": []
+					"item": [
+						{
+							"name": "Retrieve Patient Sucessfully",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status Code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Has Body\", function () {\r",
+											"    pm.response.to.have.body();\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_URL}}/Patient/1",
+									"host": [
+										"{{base_URL}}"
+									],
+									"path": [
+										"Patient",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Retrieve Patient From Another Doctor with Error",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status Code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Has Body\", function () {\r",
+											"    pm.response.to.have.body();\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_URL}}/Patient/123",
+									"host": [
+										"{{base_URL}}"
+									],
+									"path": [
+										"Patient",
+										"123"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Broken Object Level Authorization occurs when a request to an object can be successfully done even if not authorized to the object"
 				},
 				{
 					"name": "API2:2019 Broken User Authentication",
-					"item": []
+					"item": [],
+					"description": "Broken User Authentication occurs when authentication tokens can be compromised to gain access to data or assume other user's identity."
 				},
 				{
 					"name": "API3:2019 Excessive Data Exposure",
-					"item": []
+					"item": [],
+					"description": "Occurs when object properties are exposed without checking the data sensitivity and rely on the client to filter only the data they need."
 				},
 				{
 					"name": "API4:2019 Lack of Resources & Rate Limiting",
-					"item": []
+					"item": [],
+					"description": "Occurs when a client can use a lot of the server resources which then leads to DoS and also makes brute force possible."
 				},
 				{
 					"name": "API5:2019 Broken Function Level Authorization",
-					"item": []
+					"item": [],
+					"description": "Occurs when the access control policy is not clear which then leads to administrative access when not in admin mode."
 				},
 				{
 					"name": "API6:2019 Mass Assignment",
-					"item": []
+					"item": [],
+					"description": "Occurs when objects from client requests are not filtered by an allowlist and therefore an attack by modifying object properties is possible."
 				},
 				{
 					"name": "API7:2019 Security Misconfiguration",
-					"item": []
+					"item": [],
+					"description": "Occurs when the configuration is incompleted of misconfigured (HTTP Headers, HTTP Methods, CORS,...)"
 				},
 				{
 					"name": "API8:2019 Injection",
-					"item": []
+					"item": [],
+					"description": "Occurs when input is not validated and makes injectsion like SQL or command injections possible."
 				},
 				{
 					"name": "API9:2019 Improper Assets Management",
-					"item": []
+					"item": [],
+					"description": "Occurs when endpoints are exposed which doesn't need to be exposed which makes it easier for attackers to gain information."
 				},
 				{
 					"name": "API10:2019 Insufficient Logging & Monitoring",
-					"item": []
+					"item": [],
+					"description": "Occurs when logging and monitoring is not complete or integrated into incident response which makes attacks less likely to be discovered."
 				}
-			]
+			],
+			"description": "Collection of Requests to test OWASP API Top 10 [https://owasp.org/www-project-api-security/](https://owasp.org/www-project-api-security/)\n\n### ToDos:\n[ ] add Possibility to generate Data\n[ ] Add Authentication to testserver"
 		}
 	],
 	"event": [
@@ -74,7 +156,7 @@
 	"variable": [
 		{
 			"key": "base_URL",
-			"value": "http://localhost:8080",
+			"value": "http://localhost:8080/fhir",
 			"type": "string"
 		}
 	]
