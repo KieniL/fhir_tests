@@ -157,7 +157,7 @@
 										"Patient"
 									]
 								},
-								"description": "When retrieving a resources multiple times a rate limiting should be triggered at one to not come to the point where the system resources are depleted.\n\nDon't be confused by the test result since every successfull request will result in a test result error since only 429 and 503 are tested for rate limiting.\n\nSo that means if there are some pass results the Rate limiting works since 429 is returned.\n\nThis was tested with 50 iterations and a rate limit of 10 requests per second."
+								"description": "When retrieving a resources multiple times a rate limiting should be triggered at one to not come to the point where the system resources are depleted.\n\nDon't be confused by the test result since every successfull request will result in a test result error since only 429 statuscode is tested for rate limiting.\n\nSo that means if there are some pass results the Rate limiting works since 429 is returned.\n\nThis was tested with 50 iterations and a rate limit of 10 requests per second.\n\nThis is an example of a nginx config with rate limit\n\n```\nhttp {\n\n  limit_req_zone $binary_remote_addr zone=ratelimit:1m rate=10r/s;\n  limit_req_status 429;\n  \n  server {\n    listen 80;\n\n    location / {\n      limit_req zone=ratelimit;\n      proxy_pass http://hapi-fhir-jpaserver-start:8080/;\n      proxy_set_header X-Real-IP $remote_addr;\n      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n      proxy_set_header X-Forwarded-Proto $scheme;\n      proxy_set_header   Host $http_host;\n    }\n\n      \n  }\n}\n\n```"
 							},
 							"response": []
 						}
@@ -271,6 +271,10 @@
 				}
 			],
 			"description": "Collection of Requests to test OWASP API Top 10 [https://owasp.org/www-project-api-security/](https://owasp.org/www-project-api-security/)"
+		},
+		{
+			"name": "TLS",
+			"item": []
 		}
 	],
 	"event": [
