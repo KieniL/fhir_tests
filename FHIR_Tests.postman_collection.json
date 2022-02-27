@@ -2,6 +2,7 @@
 	"info": {
 		"_postman_id": "ef8d72fd-6089-4d65-a18d-ffb5edd7f032",
 		"name": "FHIR_Tests",
+		"description": "If you have a self-signed certificate like in our tests then you need to go to file/Settings/Certificates/Add Certificate to add the cert to not disable ssl verification on every request.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -274,7 +275,122 @@
 		},
 		{
 			"name": "TLS",
-			"item": []
+			"item": [
+				{
+					"name": "Check if TLS 1.0",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									" pm.test(\"Status Code is 200\", function () {\r",
+									"    pm.response.to.have.status(200) ;\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"tlsDisabledProtocols": [
+							"TLSv1_1",
+							"TLSv1_2",
+							"TLSv1_3"
+						]
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_URL}}/Patient",
+							"host": [
+								"{{base_URL}}"
+							],
+							"path": [
+								"Patient"
+							]
+						},
+						"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+					},
+					"response": []
+				},
+				{
+					"name": "Check if TLS 1.1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									" pm.test(\"Status Code is 200\", function () {\r",
+									"    pm.response.to.have.status(200) ;\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"tlsDisabledProtocols": [
+							"TLSv1",
+							"TLSv1_2",
+							"TLSv1_3"
+						]
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_URL}}/Patient",
+							"host": [
+								"{{base_URL}}"
+							],
+							"path": [
+								"Patient"
+							]
+						},
+						"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+					},
+					"response": []
+				},
+				{
+					"name": "Check if TLS >= 1.2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									" pm.test(\"Status Code is 200\", function () {\r",
+									"    pm.response.to.have.status(200) ;\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"tlsDisabledProtocols": [
+							"TLSv1",
+							"TLSv1_1"
+						]
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_URL}}/Patient",
+							"host": [
+								"{{base_URL}}"
+							],
+							"path": [
+								"Patient"
+							]
+						},
+						"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+					},
+					"response": []
+				}
+			],
+			"description": "When accessing or changing data HTTPS should be used with TLS Version of at least 1.2.\n\nThe following three requests are checking TLS versions.\n\nThe 1.0 should fail if you have configured the server to use >= 1.2\n\nThe 1.1 should fail if you have configured the server to use >= 1.2\n\nThe > 1.2 should be sucessfull if you have configured the server to use >= 1.2\n\nFollowing nginx configuration is an example for setting the tls versions\n\n```\nserver {\n    listen 443 ssl;\n    ssl_certificate     /etc/nginx/localhost.crt;\n    ssl_certificate_key /etc/nginx/localhost.key;\n\n    ssl_protocols TLSv1.2 TLSv1.3;\n\n    location / {\n      limit_req zone=ratelimit;\n      proxy_pass http://hapi-fhir-jpaserver-start:8080/;\n      proxy_set_header X-Real-IP $remote_addr;\n      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n      proxy_set_header X-Forwarded-Proto $scheme;\n      proxy_set_header   Host $http_host;\n    } \n  }\n\n```"
 		}
 	],
 	"event": [
@@ -300,7 +416,7 @@
 	"variable": [
 		{
 			"key": "base_URL",
-			"value": "http://localhost:80800/fhir",
+			"value": "https://localhost/fhir",
 			"type": "string"
 		}
 	]

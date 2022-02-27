@@ -6,6 +6,8 @@ The collection in root is the own developed collection
 
 
 ## Run Docker container with resource limitations:
+You need to create ssl certificates before so run scripts/generate_ssl.sh
+
 Execute scripts/run.sh
 
 This clones https://github.com/KieniL/hapi-fhir-jpaserver-starter which is a fork from https://github.com/hapifhir/hapi-fhir-jpaserver-starter <br/> but adds a webserver with rate limiting
@@ -28,3 +30,4 @@ Execute scripts/empty_db.sh
 - [ ] Injection
 - [ ] Improper Assets Management
 - [x] Insufficient Logging & Monitoring --> Can't be tested with Postman. Only documentation for description and requirements are possible 
+- [x] Check TLS Version
