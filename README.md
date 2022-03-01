@@ -19,16 +19,4 @@ Execute scripts/enter_dummy_data.sh
 Execute scripts/empty_db.sh
 
 ## ToDos:
-- [x] add Possibility to generate Data
-- [ ] Add Authentication to testserver
-- [ ] Broken Object Level Authorization
-- [ ] Broken User Authentication
-- [ ] Excessive Data Exposure
-- [x] Lack of Resources & Rate Limiting
-- [ ] Broken Function Level Authorization
-- [ ] Mass Assignment
-- [ ] Security Misconfiguration --> WIP by Lukas
-- [ ] Injection
-- [ ] Improper Assets Management
-- [x] Insufficient Logging & Monitoring --> Can't be tested with Postman. Only documentation for description and requirements are possible 
-- [x] Check TLS Version
+--> Are done through GitHub Issues: https://github.com/KieniL/fhir_tests/issues
