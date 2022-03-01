@@ -27,6 +27,7 @@ Execute scripts/empty_db.sh
 - [x] Lack of Resources & Rate Limiting
 - [ ] Broken Function Level Authorization
 - [ ] Mass Assignment
+- [ ] Security Misconfiguration --> WIP by Lukas
 - [ ] Injection
 - [ ] Improper Assets Management
 - [x] Insufficient Logging & Monitoring --> Can't be tested with Postman. Only documentation for description and requirements are possible 
