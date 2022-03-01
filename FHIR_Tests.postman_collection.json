@@ -132,7 +132,7 @@
 					"name": "API4:2019 Lack of Resources & Rate Limiting",
 					"item": [
 						{
-							"name": "Retrieve Patients",
+							"name": "Retrieve Patient 1",
 							"event": [
 								{
 									"listen": "test",
@@ -150,12 +150,13 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_URL}}/Patient",
+									"raw": "{{base_URL}}/Patient/1",
 									"host": [
 										"{{base_URL}}"
 									],
 									"path": [
-										"Patient"
+										"Patient",
+										"1"
 									]
 								},
 								"description": "When retrieving a resources multiple times a rate limiting should be triggered at one to not come to the point where the system resources are depleted.\n\nDon't be confused by the test result since every successfull request will result in a test result error since only 429 statuscode is tested for rate limiting.\n\nSo that means if there are some pass results the Rate limiting works since 429 is returned.\n\nThis was tested with 50 iterations and a rate limit of 10 requests per second.\n\nThis is an example of a nginx config with rate limit\n\n```\nhttp {\n\n  limit_req_zone $binary_remote_addr zone=ratelimit:1m rate=10r/s;\n  limit_req_status 429;\n  \n  server {\n    listen 80;\n\n    location / {\n      limit_req zone=ratelimit;\n      proxy_pass http://hapi-fhir-jpaserver-start:8080/;\n      proxy_set_header X-Real-IP $remote_addr;\n      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n      proxy_set_header X-Forwarded-Proto $scheme;\n      proxy_set_header   Host $http_host;\n    }\n\n      \n  }\n}\n\n```"
@@ -209,18 +210,60 @@
 					"name": "API7:2019 Security Misconfiguration",
 					"item": [
 						{
-							"name": "New Request Copy 2",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_URL}}",
-									"host": [
-										"{{base_URL}}"
-									]
+							"name": "CORS",
+							"item": [
+								{
+									"name": "Check for Malicious Origin",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"\r",
+													"pm.test(\"checks vulnerability with basic origin reflection\", function() {\r",
+													"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Origin\")).not.equal(pm.response.headers.get(\"Origin\"))\r",
+													"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Origin\")).not.equal(\"*\")\r",
+													"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Credentials\")).to.be.oneOf([undefined,'false'])\r",
+													"});\r",
+													"\r",
+													"let template = `\r",
+													"<div style=\"align-items:center;display:flex;justify-content:center;margin:16px 32px;\">\r",
+													"  <div style=\"padding:16px; font-family:Inter, OpenSans, Helvetica, Arial, sans-serif; border:1px solid #ccc; text-align:center; vertical-align:middle; border-radius:8px;background-color:#f2f2f2\">\r",
+													"    <span >{{text}}</span/>\r",
+													"    <br/>\r",
+													"    <span>Learn more at <u>{{link}}</u></span>\r",
+													"  </div>\r",
+													"  </div>\r",
+													"  `;\r",
+													"  pm.visualizer.set(template, {\r",
+													"    text:\r",
+													"      'If this test fails then it means that maybe any domain can access resources or sensitive information from your domain',\r",
+													"      link:\"https://portswigger.net/web-security/cors\"\r",
+													"  });"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_URL}}/Patient/1",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient",
+												"1"
+											]
+										},
+										"description": "Go To the CORS Folder and click run.\n\nSelect the file malicious_origin.csv with a delay and check if you don't use allow origin all or a malicious origin"
+									},
+									"response": []
 								}
-							},
-							"response": []
+							],
+							"description": "Taken from: [https://www.postman.com/postman/workspace/postman-security-workspace/collection/5917351-b6f22d43-2a6f-4ee3-a12e-617127987caf](https://www.postman.com/postman/workspace/postman-security-workspace/collection/5917351-b6f22d43-2a6f-4ee3-a12e-617127987caf)"
 						}
 					],
 					"description": "Occurs when the configuration is incompleted of misconfigured (HTTP Headers, HTTP Methods, CORS,...)"
