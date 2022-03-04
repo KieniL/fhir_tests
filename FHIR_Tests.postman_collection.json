@@ -308,7 +308,8 @@
 												"Patient",
 												"1"
 											]
-										}
+										},
+										"description": "You can run this test directly"
 									},
 									"response": []
 								}
@@ -340,23 +341,8 @@
 				},
 				{
 					"name": "API9:2019 Improper Assets Management",
-					"item": [
-						{
-							"name": "New Request Copy 2",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_URL}}",
-									"host": [
-										"{{base_URL}}"
-									]
-								}
-							},
-							"response": []
-						}
-					],
-					"description": "Occurs when endpoints are exposed which doesn't need to be exposed which makes it easier for attackers to gain information."
+					"item": [],
+					"description": "Occurs when endpoints are exposed which doesn't need to be exposed which makes it easier for attackers to gain information.\n\nCan't be automated tested since you need to have an up-to-date inventory of you API's.\n\nYou need to restric API access and also access to production data.\n\nYou need to retire old API's.\n\netc."
 				},
 				{
 					"name": "API10:2019 Insufficient Logging & Monitoring",
