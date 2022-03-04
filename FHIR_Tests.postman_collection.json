@@ -185,7 +185,7 @@
 										}
 									],
 									"request": {
-										"method": "GET",
+										"method": "HEAD",
 										"header": [],
 										"url": {
 											"raw": "{{base_URL}}/Patient/1",
@@ -221,7 +221,7 @@
 										}
 									],
 									"request": {
-										"method": "GET",
+										"method": "HEAD",
 										"header": [
 											{
 												"key": "Origin",
@@ -297,7 +297,7 @@
 										}
 									],
 									"request": {
-										"method": "GET",
+										"method": "HEAD",
 										"header": [],
 										"url": {
 											"raw": "{{base_URL}}/Patient/1",
