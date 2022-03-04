@@ -13,70 +13,17 @@
 					"name": "API1:2019 Broken Object Level Authorization",
 					"item": [
 						{
-							"name": "Retrieve Patient Sucessfully",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status Code is 200\", function () {\r",
-											"    pm.response.to.have.status(200);\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Has Body\", function () {\r",
-											"    pm.response.to.have.body();\r",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
+							"name": "New Request",
 							"request": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_URL}}/Patient/1",
+									"raw": "{{base_URL}}/Patient",
 									"host": [
 										"{{base_URL}}"
 									],
 									"path": [
-										"Patient",
-										"1"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Retrieve Patient From Another Doctor with Error",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status Code is 200\", function () {\r",
-											"    pm.response.to.have.status(200);\r",
-											"});\r",
-											"\r",
-											"pm.test(\"Has Body\", function () {\r",
-											"    pm.response.to.have.body();\r",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_URL}}/Patient/123",
-									"host": [
-										"{{base_URL}}"
-									],
-									"path": [
-										"Patient",
-										"123"
+										"Patient"
 									]
 								}
 							},
@@ -213,33 +160,25 @@
 							"name": "CORS",
 							"item": [
 								{
-									"name": "Check for Malicious Origin",
+									"name": "Basic Origin Reflection Test",
 									"event": [
 										{
 											"listen": "test",
 											"script": {
 												"exec": [
 													"\r",
-													"pm.test(\"checks vulnerability with basic origin reflection\", function() {\r",
-													"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Origin\")).not.equal(pm.response.headers.get(\"Origin\"))\r",
-													"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Origin\")).not.equal(\"*\")\r",
-													"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Credentials\")).to.be.oneOf([undefined,'false'])\r",
+													"pm.test(\"checks if malicious origin is in allowed origin list\", function() {\r",
+													"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Origin\")).not.equal(pm.iterationData.get(\"malicious_origin\"))\r",
 													"});\r",
 													"\r",
-													"let template = `\r",
-													"<div style=\"align-items:center;display:flex;justify-content:center;margin:16px 32px;\">\r",
-													"  <div style=\"padding:16px; font-family:Inter, OpenSans, Helvetica, Arial, sans-serif; border:1px solid #ccc; text-align:center; vertical-align:middle; border-radius:8px;background-color:#f2f2f2\">\r",
-													"    <span >{{text}}</span/>\r",
-													"    <br/>\r",
-													"    <span>Learn more at <u>{{link}}</u></span>\r",
-													"  </div>\r",
-													"  </div>\r",
-													"  `;\r",
-													"  pm.visualizer.set(template, {\r",
-													"    text:\r",
-													"      'If this test fails then it means that maybe any domain can access resources or sensitive information from your domain',\r",
-													"      link:\"https://portswigger.net/web-security/cors\"\r",
-													"  });"
+													"\r",
+													"pm.test(\"checks allow origin is not star\", function() {\r",
+													"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Origin\")).not.equal(\"*\")\r",
+													"});\r",
+													"\r",
+													"pm.test(\"checks allow credential is disabled\", function() {\r",
+													"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Credentials\")).to.be.oneOf([undefined,'false'])\r",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -258,7 +197,49 @@
 												"1"
 											]
 										},
-										"description": "Go To the CORS Folder and click run.\n\nSelect the file malicious_origin.csv with a delay and check if you don't use allow origin all or a malicious origin"
+										"description": "Go To the CORS Folder and click run.\n\nSelect the file testfiles/malicious_origin.csv with a delay (due to ratelimiting) and check if you don't use allow origin all or a malicious origin"
+									},
+									"response": []
+								},
+								{
+									"name": "Trusted null Origin Test",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"checks allow origin not null\", function() {\r",
+													"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Origin\")).not.equal(\"null\")\r",
+													"});\r",
+													"\r",
+													"pm.test(\"checks allowed origin exist\", function() {\r",
+													"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Origin\")).exist\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Origin",
+												"value": "null",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient/1",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient",
+												"1"
+											]
+										},
+										"description": "Run test directly to check if the server has allow origin set"
 									},
 									"response": []
 								}
