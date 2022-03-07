@@ -318,7 +318,10 @@
 													"pm.test(\"checks for undefined Powered-By header\", function() {\r",
 													"    pm.expect(pm.response.headers.get(\"X-Powered-By\")).equal(undefined)\r",
 													"});\r",
-													""
+													"\r",
+													"pm.test(\"checks for Versions in Server header\", function() {\r",
+													"    pm.expect(pm.response.headers.get(\"Server\")).not.match(/[0-9]/)\r",
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -342,7 +345,7 @@
 									"response": []
 								}
 							],
-							"description": "This Test check for some security headers to set in your config.\n\nExample nginx can be seen here:\n\n```\nadd_header 'Access-Control-Allow-Origin' 'localhost';\nadd_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, OPTIONS';\nadd_header Content-Security-Policy \"default-src 'self';\";\nadd_header X-Frame-Options \"DENY\";\nadd_header Strict-Transport-Security \"max-age=31536000; includeSubDomains\" always;\nadd_header X-XSS-Protection \"1; mode=block\";\nadd_header Expect-CT \"enforce, max-age=300, report-uri='https://localhost/'\";\nadd_header X-Content-Type-Options nosniff;\nadd_header 'Referrer-Policy' 'strict-origin-when-cross-origin';\nadd_header Permissions-Policy \"geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()\";\nadd_header Set-Cookie \"Path=/; HttpOnly; Secure\";\nadd_header Public-Key-Pins 'pin-sha256=\"PRIMARY-PIN\"; pin-sha256=\"BACKUP-PIN\"; max-age=300; includeSubDomains';\nadd_header X-Permitted-Cross-Domain-Policies master-only;\nadd_header Cross-Origin-Embedder-Policy require-corp;\nadd_header Cross-Origin-Opener-Policy same-origin;\nadd_header Cross-Origin-Resource-Policy same-origin;\nexpires 1y;\nadd_header Cache-Control \"must-revalidate\";\n\n```"
+							"description": "This Test check for some security headers to set in your config.\n\nExample nginx can be seen here:\n\n```\nadd_header 'Access-Control-Allow-Origin' 'localhost';\nadd_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, OPTIONS';\nadd_header Content-Security-Policy \"default-src 'self';\";\nadd_header X-Frame-Options \"DENY\";\nadd_header Strict-Transport-Security \"max-age=31536000; includeSubDomains\" always;\nadd_header X-XSS-Protection \"1; mode=block\";\nadd_header Expect-CT \"enforce, max-age=300, report-uri='https://localhost/'\";\nadd_header X-Content-Type-Options nosniff;\nadd_header 'Referrer-Policy' 'strict-origin-when-cross-origin';\nadd_header Permissions-Policy \"geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()\";\nadd_header Set-Cookie \"Path=/; HttpOnly; Secure\";\nadd_header Public-Key-Pins 'pin-sha256=\"PRIMARY-PIN\"; pin-sha256=\"BACKUP-PIN\"; max-age=300; includeSubDomains';\nadd_header X-Permitted-Cross-Domain-Policies master-only;\nadd_header Cross-Origin-Embedder-Policy require-corp;\nadd_header Cross-Origin-Opener-Policy same-origin;\nadd_header Cross-Origin-Resource-Policy same-origin;\nexpires 1y;\nadd_header Cache-Control \"must-revalidate\";\nproxy_hide_header X-Powered-By;\nserver_tokens off;\n\n```"
 						}
 					],
 					"description": "Occurs when the configuration is incompleted of misconfigured (HTTP Headers, HTTP Methods, CORS,...)"
