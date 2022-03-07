@@ -314,6 +314,10 @@
 													"pm.test(\"checks for Cache-Control header\", function() {\r",
 													"    pm.expect(pm.response.headers.get(\"Cache-Control\")).not.equal(undefined)\r",
 													"});\r",
+													"\r",
+													"pm.test(\"checks for undefined Powered-By header\", function() {\r",
+													"    pm.expect(pm.response.headers.get(\"X-Powered-By\")).equal(undefined)\r",
+													"});\r",
 													""
 												],
 												"type": "text/javascript"
@@ -347,14 +351,53 @@
 					"name": "API8:2019 Injection",
 					"item": [
 						{
-							"name": "New Request Copy",
+							"name": "OS_command_injection_reboot_test",
 							"request": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_URL}}",
+									"raw": "{{base_URL_noTLS}}/Patient;reboot",
 									"host": [
-										"{{base_URL}}"
+										"{{base_URL_noTLS}}"
+									],
+									"path": [
+										"Patient;reboot"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "sql_injection_payload_0",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_URL_noTLS}}/Patient/'or 1=1--",
+									"host": [
+										"{{base_URL_noTLS}}"
+									],
+									"path": [
+										"Patient",
+										"'or 1=1--"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "sql_injection_test_payload_1",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_URL_noTLS}}/Patient/p'+or+'1'='1",
+									"host": [
+										"{{base_URL_noTLS}}"
+									],
+									"path": [
+										"Patient",
+										"p'+or+'1'='1"
 									]
 								}
 							},
@@ -494,6 +537,53 @@
 				}
 			],
 			"description": "When accessing or changing data HTTPS should be used with TLS Version of at least 1.2.\n\nThe following three requests are checking TLS versions.\n\nThe 1.0 should fail if you have configured the server to use >= 1.2\n\nThe 1.1 should fail if you have configured the server to use >= 1.2\n\nThe > 1.2 should be sucessfull if you have configured the server to use >= 1.2\n\nFollowing nginx configuration is an example for setting the tls versions\n\n```\nserver {\n    listen 443 ssl;\n    ssl_certificate     /etc/nginx/localhost.crt;\n    ssl_certificate_key /etc/nginx/localhost.key;\n\n    ssl_protocols TLSv1.2 TLSv1.3;\n\n    location / {\n      limit_req zone=ratelimit;\n      proxy_pass http://hapi-fhir-jpaserver-start:8080/;\n      proxy_set_header X-Real-IP $remote_addr;\n      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n      proxy_set_header X-Forwarded-Proto $scheme;\n      proxy_set_header   Host $http_host;\n    } \n  }\n\n```"
+		},
+		{
+			"name": "DataFeeding_For_Fhir_Server",
+			"item": [
+				{
+					"name": "Create_PatientResource_with_different_Email_address_and_name",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let date = Date.now();\r",
+									"let name = date;\r",
+									"let email = 'ali_'+ date +'_@yahoo.com';\r",
+									"pm.environment.set('patientname',name);\r",
+									"pm.environment.set('emailaddress', email);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"resourceType\": \"Patient\",\r\n    \"name\":[\r\n      {\r\n          \"use\":\"official\",\r\n          \"given\":[{{patientname}}],\r\n          \"family\":\"Noori\"\r\n      }\r\n    ],\r\n    \"gender\":\"male\",\r\n    \"birthdate\":\"1994-12-19\",\r\n    \"telecom\":[\r\n        {\r\n            \"value\":\"06769616315\",\r\n            \"use\":\"mobile\",\r\n            \"system\":\"phone\"\r\n        },\r\n        {\r\n            \"system\":\"email\",\r\n            \"value\":\"{{emailaddress}}\"\r\n        }\r\n    ],\r\n    \"address\":[\r\n        {\r\n            \"line\":[\r\n                \"15,Kochgasse\"\r\n            ],\r\n            \"city\":\"Vienna\",\r\n            \"state\":\"Vienna\",\r\n            \"postalcode\":\"1080\"\r\n        }\r\n    ]\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_URL_noTLS}}/Patient/",
+							"host": [
+								"{{base_URL_noTLS}}"
+							],
+							"path": [
+								"Patient",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -520,6 +610,11 @@
 		{
 			"key": "base_URL",
 			"value": "https://localhost/fhir",
+			"type": "string"
+		},
+		{
+			"key": "base_URL_noTLS",
+			"value": "http://localhost:8080/fhir",
 			"type": "string"
 		}
 	]
