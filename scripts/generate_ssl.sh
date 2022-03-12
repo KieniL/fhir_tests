@@ -1,5 +1,6 @@
 #!/bin/sh
 
-openssl req -newkey rsa:2048 -nodes \
--keyout hapi-fhir-jpaserver-starter/nginx/localhost.key \
--x509 -days 365 -out hapi-fhir-jpaserver-starter/nginx/localhost.crt \
+openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes   \
+-keyout hapi-fhir-jpaserver-starter/ssl/localhost.key \
+-out hapi-fhir-jpaserver-starter/ssl/localhost.crt -subj '/CN=localhost'   \
+-addext 'subjectAltName=DNS:dex.localhost'
