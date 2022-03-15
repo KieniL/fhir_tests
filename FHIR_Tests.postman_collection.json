@@ -42,7 +42,21 @@
 					"name": "API2:2019 Broken User Authentication",
 					"item": [
 						{
-							"name": "New Request Copy",
+							"name": "Successfull Retrieval",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"testing Cookie authentication. Should be 200 or 201.\", function () {\r",
+											"     pm.expect(pm.response.code).to.be.oneOf([200, 201])\r",
+											" });\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -60,7 +74,173 @@
 									"path": [
 										"Patient"
 									]
+								},
+								"description": "Cookie is set in header and the login is done with this"
+							},
+							"response": []
+						},
+						{
+							"name": "Test empty cookie",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Testing with empty oauth cookie. Should be 403 which means forwarding to login.\", function () {\r",
+											"     pm.expect(pm.response.code).to.be.oneOf([403])\r",
+											" });\r",
+											""
+										],
+										"type": "text/javascript"
+									}
 								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_URL}}/Patient",
+									"host": [
+										"{{base_URL}}"
+									],
+									"path": [
+										"Patient"
+									]
+								},
+								"description": "No cookie is in header which makes it necessary to login."
+							},
+							"response": []
+						},
+						{
+							"name": "Test keyless cookie",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Testing without oauth cookiekey. Should be 403 which means forwarding to login.\", function () {\r",
+											"     pm.expect(pm.response.code).to.be.oneOf([403])\r",
+											" });\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "{{oauth_cookie}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_URL}}/Patient",
+									"host": [
+										"{{base_URL}}"
+									],
+									"path": [
+										"Patient"
+									]
+								},
+								"description": "cookie in header is not right formatted which makes it necessary to login."
+							},
+							"response": []
+						},
+						{
+							"name": "Test valueless cookie",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Testing with valueless header oauth cookie. Should be 403 which means forwarding to login.\", function () {\r",
+											"     pm.expect(pm.response.code).to.be.oneOf([403])\r",
+											" });\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "_oauth2_proxy=",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_URL}}/Patient",
+									"host": [
+										"{{base_URL}}"
+									],
+									"path": [
+										"Patient"
+									]
+								},
+								"description": "cookie in header is not right formatted which makes it necessary to login."
+							},
+							"response": []
+						},
+						{
+							"name": "Test wrong cookie",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Testing with valueless header oauth cookie. Should be 403 which means forwarding to login.\", function () {\r",
+											"     pm.expect(pm.response.code).to.be.oneOf([403])\r",
+											" });\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.request.headers.add({\r",
+											"  key: 'Cookie',\r",
+											"  value: '_oauth2_proxy=Test' \r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "_oauth2_proxy={{oauth_cookie}}",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "{{base_URL}}/Patient",
+									"host": [
+										"{{base_URL}}"
+									],
+									"path": [
+										"Patient"
+									]
+								},
+								"description": "The cookie in the header is not used. A Pre-Request skript is used to set a customized header cookie"
 							},
 							"response": []
 						}
@@ -413,55 +593,98 @@
 					"name": "API8:2019 Injection",
 					"item": [
 						{
-							"name": "OS_command_injection_reboot_test",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_URL_noTLS}}/Patient;reboot",
-									"host": [
-										"{{base_URL_noTLS}}"
-									],
-									"path": [
-										"Patient;reboot"
-									]
+							"name": "os_command_injection_endpoint",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Status Code 404 and 400 --> testing os command injection for unix. Should fail\", function () {\r",
+											"     pm.expect(pm.response.code).to.be.oneOf([400, 404])\r",
+											" });\r",
+											""
+										],
+										"type": "text/javascript"
+									}
 								}
-							},
-							"response": []
-						},
-						{
-							"name": "sql_injection_payload_0",
+							],
 							"request": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_URL_noTLS}}/Patient/'or 1=1--",
-									"host": [
-										"{{base_URL_noTLS}}"
-									],
-									"path": [
-										"Patient",
-										"'or 1=1--"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "sql_injection_test_payload_1",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{base_URL_noTLS}}/Patient/p'+or+'1'='1",
+									"raw": "{{base_URL_noTLS}}/Patient/{{os-command-injection-endpoint}}",
 									"host": [
 										"{{base_URL_noTLS}}"
 									],
 									"path": [
 										"Patient",
-										"p'+or+'1'='1"
+										"{{os-command-injection-endpoint}}"
 									]
+								},
+								"description": "A list of 103 unix commands are used to to test the \"os command injection\". The payload list was taken from the follwoing Github source:\n\n[https://github.com/payloadbox/command-injection-payload-list](https://github.com/payloadbox/command-injection-payload-list)\n\nWhile testing the api with the payload all the tests must pass with the following status codes:\n\n400\n\nor\n\n404\n\nif anyother status code such as 200 appear, then there must be a vulnerability."
+							},
+							"response": []
+						},
+						{
+							"name": "os_command_injection_endpoint Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var body = JSON.parse(responseBody);\r",
+											"tests[\"Count: \"  + body.value.length] = true;"
+										],
+										"type": "text/javascript"
+									}
 								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_URL_noTLS}}/Patient/21",
+									"host": [
+										"{{base_URL_noTLS}}"
+									],
+									"path": [
+										"Patient",
+										"21"
+									]
+								},
+								"description": "A list of 103 unix commands are used to to test the \"os command injection\". The payload list was taken from the follwoing Github source:\n\n[https://github.com/payloadbox/command-injection-payload-list](https://github.com/payloadbox/command-injection-payload-list)\n\nWhile testing the api with the payload all the tests must pass with the following status codes:\n\n400\n\nor\n\n404\n\nif anyother status code such as 200 appear, then there must be a vulnerability."
+							},
+							"response": []
+						},
+						{
+							"name": "sql-injection-endpoints",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Status Code 404 and 400 --> testing sql injection. Should fail\", function () {\r",
+											"     pm.expect(pm.response.code).to.be.oneOf([400, 404])\r",
+											" });\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_URL_noTLS}}/{{sql-injection-endpoint}}",
+									"host": [
+										"{{base_URL_noTLS}}"
+									],
+									"path": [
+										"{{sql-injection-endpoint}}"
+									]
+								},
+								"description": "Some basic sql injection statements are tested using the following authorization bypassing payload from the Github:\n\n[https://github.com/payloadbox/sql-injection-payload-list/blob/master/Intruder/exploit/Auth_Bypass.txt](https://github.com/payloadbox/sql-injection-payload-list/blob/master/Intruder/exploit/Auth_Bypass.txt)\n\nThe list contains 98 sql statements"
 							},
 							"response": []
 						}
@@ -651,13 +874,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_URL_noTLS}}/Patient/",
+							"raw": "{{base_URL_noTLS}}/{",
 							"host": [
 								"{{base_URL_noTLS}}"
 							],
 							"path": [
-								"Patient",
-								""
+								"{"
 							]
 						}
 					},
