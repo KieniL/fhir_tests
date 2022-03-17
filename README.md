@@ -19,4 +19,4 @@ Execute scripts/enter_dummy_data.sh
 Execute scripts/empty_db.sh
 
 ## ToDos:
---> Are done through GitHub Issues: https://github.com/KieniL/fhir_tests/issues
+--> Are done through Teams Tasks
