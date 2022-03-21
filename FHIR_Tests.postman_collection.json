@@ -251,7 +251,19 @@
 					"name": "API3:2019 Excessive Data Exposure",
 					"item": [
 						{
-							"name": "New Request Copy 2",
+							"name": "responseReference",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const response = pm.response.json();\r",
+											"pm.globals.set(\"expectedResponse\",response);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -262,12 +274,62 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_URL}}/Patient",
+									"raw": "{{base_URL_noTLS}}/Patient/77",
 									"host": [
-										"{{base_URL}}"
+										"{{base_URL_noTLS}}"
 									],
 									"path": [
-										"Patient"
+										"Patient",
+										"77"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "responseTest",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"response body contains no excessive data while trying to access an unavailable patient id\",() => {\r",
+											"    const responsev2 = pm.response.json();\r",
+											"    const responsev1 = pm.globals.get(\"expectedResponse\");\r",
+											"\r",
+											"    delete responsev1.issue[0].diagnostics;\r",
+											"    delete responsev2.issue[0].diagnostics;\r",
+											"  //delete responsev1.issue;\r",
+											"  //delete responsev2.issue;\r",
+											"    delete responsev1.text.div;\r",
+											"    delete responsev2.text.div;\r",
+											"    console.log(responsev1);\r",
+											"    console.log(responsev2);\r",
+											"    pm.expect(responsev2).to.eql(responsev1); // compare the response from \"responseReference\" with the response from \"responseTest\"\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "_oauth2_proxy={{oauth_cookie}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_URL_noTLS}}/Patient/10",
+									"host": [
+										"{{base_URL_noTLS}}"
+									],
+									"path": [
+										"Patient",
+										"10"
 									]
 								}
 							},
@@ -324,7 +386,20 @@
 					"name": "API5:2019 Broken Function Level Authorization",
 					"item": [
 						{
-							"name": "New Request Copy 2",
+							"name": "Get as admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Status Code is 200 --> Is admin user and allowed on \" + pm.iterationData.get(\"admin_path\"), function () {\r",
+											"    pm.response.to.have.status(200) ;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -335,19 +410,51 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_URL}}/Patient",
+									"raw": "{{base_URL}}{{admin_path}}",
 									"host": [
-										"{{base_URL}}"
-									],
-									"path": [
-										"Patient"
+										"{{base_URL}}{{admin_path}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get as regular user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Status Code is 401 --> Unauthorized is not allowed on \" + pm.iterationData.get(\"admin_path\"), function () {\r",
+											"    pm.response.to.have.status(401) ;\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "_oauth2_proxy={{oauth_cookie_regular_user}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_URL}}{{admin_path}}",
+									"host": [
+										"{{base_URL}}{{admin_path}}"
 									]
 								}
 							},
 							"response": []
 						}
 					],
-					"description": "Occurs when the access control policy is not clear which then leads to administrative access when not in admin mode."
+					"description": "Occurs when the access control policy is not clear which then leads to administrative access when not in admin mode.\n\nGo To the API:5 Folder and click run.\n\nSelect the file testfiles/admin_paths.csv with a delay (due to ratelimiting) and check if you don't allow admin_paths for non admin users"
 				},
 				{
 					"name": "API6:2019 Mass Assignment",
@@ -874,12 +981,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_URL_noTLS}}/{",
+							"raw": "{{base_URL_noTLS}}/Patient/",
 							"host": [
 								"{{base_URL_noTLS}}"
 							],
 							"path": [
-								"{"
+								"Patient",
+								""
 							]
 						}
 					},
@@ -922,6 +1030,11 @@
 		{
 			"key": "oauth_cookie",
 			"value": "bWH59TGZN8M_xm7i1HLsMjND9VrvrR07St4uJXcsTsv0wu5Lgpboi_xmhJPIbW7-SE-m5pWHhOj25QHgws6Iq9VMRH10Ka_uviBPHm9wXmDqNr44SS0CPQGHTLuPr2WxEAutLjKWRA2bzP7jv9uC7Pfr753xcnkV_yFhgjyvyXCr4vR8RmD8aj0DnPpLaR2pqJJB6B5FLCSKpjVwvKrsi93hmnADjhvJzytCK-ZnslB9f3AQPm-gmYmXsIOeagthY8wnUM9YQApMm-y3Ug3GNRnl-u7RCR25G7tJ1eGfG5cdAM50eihZxT9y7a61jrEWjPc57_pdSSS5KQYn0A-zyzUzhPbDkUywnSSpLTF9ldBbcowNlR2AO6QhKSRjBcKIBiAPi1FRrDBSVqt86Ag4gt5GIG2bMQycmITwuGg5QmKODC92Bl5UkxYxWCVaiS-fb59U2PUs84ZgxXQx0vGqyiTnO8tmibWmA1tfDnM6wCN1yacdWXFagwRyH1chPXuNgv-Km-_R2Org3I-gRu5LdNAv7DFEJvmXzkrmhllP1w8FvJRFnTb9Z3yosCvp8QVyZ3qkoUAh_hp_uwAqU6Tg4r7ok5MS_M5VQTYdY37aEqW6U7j_MI04KwkDgSYWNFT_d8cBhgSwtV86oLBzQs0QDsDPYdunPtC5ydSEBHHRCFFKIV7-HULnIjlCKO9P0_KjUgfFQJvnIXwP9B73CsqLBtwC8wq4VDE3uGThZDqFP-6yNAZA9UoWvtDFeS64imRQTSMdJbpYNcGi9aFs6EQArENKKHl9Rm5B6d7T_hgQE9YRljqW7I4YQGxxgaYTw7iezhpJTRw6kaV4WIBnwuvQP2sZD-H9MBQ4D1pGfAR6Y1kaSArq6tGe6nVKSoILhphz3ireIeDxoWg9Nd0MCBvgNoZdd5NU6xru_XV9sy6SFvbMDtkHaQ_tT-yNjGrM4AQtjGPlbZ6PDxhJekZcj8O70aW6qhuD7jKmNrWWvwKulqDrheVoVBpI-KLtZgxpARt5bYDF_8p5UIO9zNPVBcz-hGtjHOHOyWQKIcB_kgnr7ezugxzF4dZAWifO0fXQEKvAz6_Eh2ajU365aJgER4tGT52QWB2xGMmvfTICggz4jDhP5y5ZNP0BMqlpHGWtvaYS0148n1JIS0JQve-89ODF1a6GhrTrcr3e1E53jgSxPM1RsydVib70Ijl2zMFXDJtONDRlLEYL9ezFOh4xGRCOKTkoefjEPPGYjSMaLGtS4VJhpb8hmVsQvAUB2ek4ivPX9kM05Q269KrNchFHul9CsuwSwLU4ogOFivW3XjqfCf3XdWfkvXDMsWx-jzz9hqCwdhJ309tgVdcuD-a1DGpTtF2tav8lEuGz1rTK2kQNS5dy9gkg2FvmHtUI8jSibMPEx8jRQmkhayipnEMbnVfdKh79Miw8gBSZGaJQ6sz3ooEU9CFlyEBctB3owpY40zNOusbuaNSGqlBVEKfnCg1RC_M6E-3AQ-kpxM4RhYfOJZUrBVShXqZ_iLe1rfOlP-ySUXxTZXdRK-OiOhRPRTtEsrySCKS7ESfuJcmNvNwuMw-BW8s87m_y9JwONui3yqHF9HeEFVMhN5mK-tBla1-jlvD6gLiZfk9Z3WaLm2kN00kjFgZ7oBfFeapijgfFlauVO97OsZOJ2ytmk50VqrMUrnEjwSeH1_FzqqbiQKUlhMAupx6yHyKsEvuCmt2t-sY_IIXluRG-YWcORcs3IFja3rW_4ibtAlAxfySQgFfZZFM3Q5USiHkUIcwlrh7trl2ISX_drzvgJ2lhlGX3AjZtSC9ayQ==|1647086827|23Ok_2pu7qzGUftYwJI0Ki1zxgre3DGDmYNIr-ng3jQ=",
+			"type": "string"
+		},
+		{
+			"key": "oauth_cookie_regular_user",
+			"value": "h4IZohWX3Aa81mQgn7bguhE0hkqKsukTRCbsHg9GrvEHRfBznGJz-x1oAlr5rOPI2IFnqvkpv-H2x-bSFdDw6schak99vT9OF1IqGSE_VrLP6rDfREPwC13Kavas8uAzG5G1pv9AoVYZqw5bLmBWFeFCZPPHFkhQ9r-nRkdxWZItd0k6VDU1H0YlItoay0EXfeAPcJ7_9_hSrmPl2fy291THCmFxCu7-GCgJqCJEOFrm_-d398rIDeOD9j4Xsfb-mm91uf34uIvxPDx0XsCZXrYGrCuuL7TF9_MUNLKN-VMUo83EKO3MJu2nOWWEqHeb8SqZzq2Oov2HIgqfbXnnhWL-QUfC63UD4wCn7507Nfg_2iNPsXyz_0IgYqTBgjeAq2bfwzBvsbf2VTtNvgRjtmTpr10KAZ1wy9dHdkzBdOEEPdF2w3hsrGOpL_DqA236Ocfkesk48oPi5re7Ljv9x1nL6PwA78Dk3Ldxoj7H_OrXUVkbs7Wui62SVWOLw8QWlyEsbgl5C2V5J7nJTQyfMLPYvZ7FCxHzO7qJP54rnXe5w25XaciIxAMFDxNJTC8AZJ8o8D9fYyH1PNbc5bqzVCTzvuDXPAliKE61WWKo6d0CSL6uHgG4VIIef_eOuGrLE1iTdxO5WnauN3gdnoXJrELndSDIn1t9JZmcdvraq-_ceat4Vv9huHXbpIuif5GdjQCi1DtFkMERI4va1DM1SYwk1CbMGUgqJd1jXutdiuqSqrBDp3eQvh8RE__bN9ilP-aARKe7thKDHvYPCILD14mgsNe6Npbl-ZxVqKHGP4kzJV7APJdUm1x1M0LmHGYN22UIiSzcmvVmq5WgiV-1SkGbR0ZoCHugdYJK6LL5JCo3z7r3th8x3pYlZ1da1d-ZSZSiDI_bxVoauIyi2MyEubmmlYIKTQ6eDTxV1_0fDux9UuKdVU28ugsZt6cOQbznUvMVfhSW0hWeT6XvYCu2IT1FmaQbBs82rpmQ5PIsl2hcPs9wPGHLnkjNNXV_FQHbgAgq_TsvtzBWgJFMouDwOt_JAItCZ0Nc82SXLPGFVbCNQIZ3GhRaMIBFBRucrfOrqTIeXAW20W-kJhewjbuKiMH2hBFRXCsEAxLn2P41a11JvrKLICJyd2jYzvz4_GsesTaHDcUnes2TL7-1e9hEufpyp7rSJ3FOt09q0qIvcByy7FUYf7eGMGOxRD_Uq_ZvU6ITZ0_no7EVviHA0tw3qtvfM3z6qPWqf8uJCs1KzyMnSxbwUydwFgXXoQZPqVXjUibipoP6Pw4B6dNXrUp4_GDs-69g_bc1uHuxFOx9ZaHwP4u9hlf2Ap7S7-2mSZLVLZzEd_4CzsAl2baPKaC2mpsA4M1q51pL3VeO590YGUscRMEtvcUOjBHnYjQ3AvBs5AVI16iAn6hfubTwAhyJzo0DAfOksHnYVTYC43pLwZqdBW14agrrT-Vg_w81opJwuwz-3ByblR0KT_Z52rCsK60OoJ-yj_UTfUg5IiXFYTqEXyBaO3ZqZxO_4TggLJrAqIuM_nfozgbb697Yven3oJK1ABKjBs-55NGRwe2aG3RhzDU_yV5YQuWZnBTsipFWl0KsrmIW7xbO-4I7i6YvKEPjiWkI8ZiCmHFSjHDbS3vks0JRyZPfLqwEK3IUXa_yN_aQV-c0kxRLw-AHC05M5t0Yynd534BFuo6pxeWiRHOX8XoYo9ycTLe8BW2ED_OGOhHufFMX0o7o70lD20yW9zKGUnxWP1oThq380Z6kYzYkuttDG6REvaVyyfh7L8z97SHa7TSHwzkOj3Wko3y5L_jMYZ0=|1647786979|oBucKXOA_abjuajoO3nW5SnKPkYrNpz_MmmNLvZbvAo=",
 			"type": "string"
 		}
 	]
