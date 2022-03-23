@@ -342,7 +342,7 @@
 					"name": "API4:2019 Lack of Resources & Rate Limiting",
 					"item": [
 						{
-							"name": "Retrieve Patient 3",
+							"name": "Retrieve Patients",
 							"event": [
 								{
 									"listen": "test",
@@ -366,13 +366,13 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_URL}}/Patient/3",
+									"raw": "{{base_URL}}/Patient/",
 									"host": [
 										"{{base_URL}}"
 									],
 									"path": [
 										"Patient",
-										"3"
+										""
 									]
 								},
 								"description": "When retrieving a resources multiple times a rate limiting should be triggered at one to not come to the point where the system resources are depleted.\n\nDon't be confused by the test result since every successfull request will result in a test result error since only 429 statuscode is tested for rate limiting.\n\nSo that means if there are some pass results the Rate limiting works since 429 is returned.\n\nThis was tested with 50 iterations and a rate limit of 10 requests per second.\n\nThis is an example of a nginx config with rate limit\n\n```\nhttp {\n\n  limit_req_zone $binary_remote_addr zone=ratelimit:1m rate=10r/s;\n  limit_req_status 429;\n  \n  server {\n    listen 80;\n\n    location / {\n      limit_req zone=ratelimit;\n      proxy_pass http://hapi-fhir-jpaserver-start:8080/;\n      proxy_set_header X-Real-IP $remote_addr;\n      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n      proxy_set_header X-Forwarded-Proto $scheme;\n      proxy_set_header   Host $http_host;\n    }\n\n      \n  }\n}\n\n```"
@@ -419,6 +419,39 @@
 							"response": []
 						},
 						{
+							"name": "Get Options as admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Status Code is 200 --> Is admin user and allowed on CapabilityStatement\", function () {\r",
+											"    pm.response.to.have.status(200) ;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "OPTIONS",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "_oauth2_proxy={{oauth_cookie}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_URL}}",
+									"host": [
+										"{{base_URL}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Get as regular user",
 							"event": [
 								{
@@ -448,6 +481,41 @@
 									"raw": "{{base_URL}}{{admin_path}}",
 									"host": [
 										"{{base_URL}}{{admin_path}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Options as regular user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Status Code is 401 --> Unauthorized is not allowed on Capability Statement\", function () {\r",
+											"    pm.response.to.have.status(401) ;\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "OPTIONS",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "_oauth2_proxy={{oauth_cookie_regular_user}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_URL}}",
+									"host": [
+										"{{base_URL}}"
 									]
 								}
 							},
@@ -815,135 +883,1247 @@
 			"name": "TLS",
 			"item": [
 				{
-					"name": "Check if TLS 1.0",
-					"event": [
+					"name": "Versions",
+					"item": [
 						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									" pm.test(\"Status Code is 200\", function () {\r",
-									"    pm.response.to.have.status(200) ;\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"tlsDisabledProtocols": [
-							"TLSv1_1",
-							"TLSv1_2",
-							"TLSv1_3"
-						]
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": "_oauth2_proxy={{oauth_cookie}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_URL}}/Patient",
-							"host": [
-								"{{base_URL}}"
+							"name": "Check if TLS 1.0",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Status Code is 200\", function () {\r",
+											"    pm.response.to.have.status(200) ;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
 							],
-							"path": [
-								"Patient"
-							]
+							"protocolProfileBehavior": {
+								"tlsDisabledProtocols": [
+									"TLSv1_1",
+									"TLSv1_2",
+									"TLSv1_3"
+								]
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "_oauth2_proxy={{oauth_cookie}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_URL}}/Patient",
+									"host": [
+										"{{base_URL}}"
+									],
+									"path": [
+										"Patient"
+									]
+								},
+								"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+							},
+							"response": []
 						},
-						"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
-					},
-					"response": []
+						{
+							"name": "Check if TLS 1.1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Status Code is 200\", function () {\r",
+											"    pm.response.to.have.status(200) ;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"tlsDisabledProtocols": [
+									"TLSv1",
+									"TLSv1_2",
+									"TLSv1_3"
+								]
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "_oauth2_proxy={{oauth_cookie}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_URL}}/Patient",
+									"host": [
+										"{{base_URL}}"
+									],
+									"path": [
+										"Patient"
+									]
+								},
+								"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+							},
+							"response": []
+						},
+						{
+							"name": "Check if TLS >= 1.2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Status Code is 200\", function () {\r",
+											"    pm.response.to.have.status(200) ;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"tlsDisabledProtocols": [
+									"TLSv1",
+									"TLSv1_1"
+								]
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "_oauth2_proxy={{oauth_cookie}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_URL}}/Patient",
+									"host": [
+										"{{base_URL}}"
+									],
+									"path": [
+										"Patient"
+									]
+								},
+								"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+							},
+							"response": []
+						}
+					]
 				},
 				{
-					"name": "Check if TLS 1.1",
-					"event": [
+					"name": "Ciphers",
+					"item": [
 						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									" pm.test(\"Status Code is 200\", function () {\r",
-									"    pm.response.to.have.status(200) ;\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"tlsDisabledProtocols": [
-							"TLSv1",
-							"TLSv1_2",
-							"TLSv1_3"
-						]
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": "_oauth2_proxy={{oauth_cookie}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_URL}}/Patient",
-							"host": [
-								"{{base_URL}}"
-							],
-							"path": [
-								"Patient"
+							"name": "TLS Version 1.2",
+							"item": [
+								{
+									"name": "Test_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_DHE_DSS_ WITH_AES_256_GCM_SHA384",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_DHE_DSS_WITH_AES_256_GCM_SHA384"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_DHE_RSA_ WITH_AES_256_GCM_SHA384",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_ECDHE_ECDSA_WITH_CHACHA20POLY1305_SHA256",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_ECDHE_ECDSA_WITH_CHACHA20POLY1305_SHA256"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_ECDHE_RSA_WITH_CHACHA20POLY1305_SHA256",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_ECDHE_RSA_WITH_CHACHA20POLY1305_SHA256"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_DHE_RSA_WITH_CHACHA20POLY1305_SHA256",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_DHE_RSA_WITH_CHACHA20POLY1305_SHA256"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_ECDHE_ECDSA_WITH_AES_256_CCM",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_ECDHE_ECDSA_WITH_AES_256_CCM"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_DHE_RSA_ WITH_AES_256_CCM",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_DHE_RSA_WITH_AES_256_CCM"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_DHE_DSS_ WITH_AES_128_GCM_SHA256",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_DHE_DSS_WITH_AES_128_GCM_SHA256"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_DHE_RSA_ WITH_AES_128_GCM_SHA256",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_DHE_RSA_WITH_AES_128_GCM_SHA256"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_ECDHE_ECDSA_WITH_AES_128_CCM",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_ECDHE_ECDSA_WITH_AES_128_CCM"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_DHE_RSA_ WITH_AES_128_CCM",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_DHE_RSA_WITH_AES_128_CCM"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_DHE_DSS_ WITH_AES_256_CBC_SHA256",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_DHE_DSS_WITH_AES_256_CBC_SHA256"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_DHE_RSA_ WITH_AES_256_CBC_SHA256",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_DHE_RSA_WITH_AES_256_CBC_SHA256"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_DHE_DSS_ WITH_AES_128_CBC_SHA256",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_DHE_DSS_WITH_AES_128_CBC_SHA256"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_DHE_RSA_ WITH_AES_128_CBC_SHA256",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_DHE_RSA_WITH_AES_128_CBC_SHA256"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								}
 							]
 						},
-						"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
-					},
-					"response": []
-				},
-				{
-					"name": "Check if TLS >= 1.2",
-					"event": [
 						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									" pm.test(\"Status Code is 200\", function () {\r",
-									"    pm.response.to.have.status(200) ;\r",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"tlsDisabledProtocols": [
-							"TLSv1",
-							"TLSv1_1"
-						]
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Cookie",
-								"value": "_oauth2_proxy={{oauth_cookie}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_URL}}/Patient",
-							"host": [
-								"{{base_URL}}"
-							],
-							"path": [
-								"Patient"
+							"name": "TLS Version 1.3",
+							"item": [
+								{
+									"name": "Test_TLS_CHACHA20_POLY1305_SHA256",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_CHACHA20_POLY1305_SHA256"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_AES_256_GCM_SHA384",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_AES_256_GCM_SHA384"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								},
+								{
+									"name": "Test_TLS_AES_128_GCM_SHA256",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" pm.test(\"Status Code is 200\", function () {\r",
+													"    pm.response.to.have.status(200) ;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"tlsCipherSelection": [
+											"TLS_AES_128_GCM_SHA256"
+										]
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "_oauth2_proxy={{oauth_cookie}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{base_URL}}/Patient",
+											"host": [
+												"{{base_URL}}"
+											],
+											"path": [
+												"Patient"
+											]
+										},
+										"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
+									},
+									"response": []
+								}
 							]
-						},
-						"description": "When retrieving a resource over TLS at least version 1.2 should be used. So that means"
-					},
-					"response": []
+						}
+					]
 				}
 			],
 			"description": "When accessing or changing data HTTPS should be used with TLS Version of at least 1.2.\n\nThe following three requests are checking TLS versions.\n\nThe 1.0 should fail if you have configured the server to use >= 1.2\n\nThe 1.1 should fail if you have configured the server to use >= 1.2\n\nThe > 1.2 should be sucessfull if you have configured the server to use >= 1.2\n\nFollowing nginx configuration is an example for setting the tls versions\n\n```\nserver {\n    listen 443 ssl;\n    ssl_certificate     /etc/nginx/localhost.crt;\n    ssl_certificate_key /etc/nginx/localhost.key;\n\n    ssl_protocols TLSv1.2 TLSv1.3;\n\n    location / {\n      limit_req zone=ratelimit;\n      proxy_pass http://hapi-fhir-jpaserver-start:8080/;\n      proxy_set_header X-Real-IP $remote_addr;\n      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n      proxy_set_header X-Forwarded-Proto $scheme;\n      proxy_set_header   Host $http_host;\n    } \n  }\n\n```"
