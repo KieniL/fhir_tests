@@ -13,7 +13,21 @@
 					"name": "API1:2019 Broken Object Level Authorization",
 					"item": [
 						{
-							"name": "New Request",
+							"name": "Get Patients by enumeration",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Status Code is 401 --> user is not authorized for Patient\", function () {\r",
+											"    pm.response.to.have.status(401) ;\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -24,19 +38,20 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_URL}}/Patient",
+									"raw": "{{base_URL}}/Patient/{{id}}",
 									"host": [
 										"{{base_URL}}"
 									],
 									"path": [
-										"Patient"
+										"Patient",
+										"{{id}}"
 									]
 								}
 							},
 							"response": []
 						}
 					],
-					"description": "Broken Object Level Authorization occurs when a request to an object can be successfully done even if not authorized to the object"
+					"description": "Broken Object Level Authorization occurs when a request to an object can be successfully done even if not authorized to the object.\n\nSelect testfiles/ids.csv and run API1 location."
 				},
 				{
 					"name": "API2:2019 Broken User Authentication",
