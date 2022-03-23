@@ -1,0 +1,5 @@
+body
+<div>alert('Hi');</div>
+<div><script>alert('Hi');</script></div>
+alert('Hi');
+<script>alert('Hi');</script>

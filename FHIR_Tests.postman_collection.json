@@ -2189,6 +2189,58 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "XSS",
+			"item": [
+				{
+					"name": "Stored XSS on Patient",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									" pm.test(\"Status Code is not 201,200 or 203 --> object was not created \" + pm.response, function () {\r",
+									"     pm.expect(pm.response.code).to.not.equal(201,200,203)\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "_oauth2_proxy={{oauth_cookie}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"resourceType\": \"Patient\",\r\n  \"text\": {\r\n    \"status\": \"generated\",\r\n    \"div\": \"{{body}}\"\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "{{base_URL}}/Patient/",
+							"host": [
+								"{{base_URL}}"
+							],
+							"path": [
+								"Patient",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
