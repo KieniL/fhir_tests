@@ -2200,7 +2200,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									" pm.test(\"Status Code is not 201,200 or 203 --> object was not created \" + pm.response, function () {\r",
+									" pm.test(\"Status Code is not 201,200 or 203 --> object was not created \", function () {\r",
 									"     pm.expect(pm.response.code).to.not.equal(201,200,203)\r",
 									"});\r",
 									""
@@ -2240,7 +2240,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "Run this folder with the file testfiles/xss_bodies.csv.\n\nThere should be a lot of passes since this means that the request was not successfull."
 		}
 	],
 	"event": [
