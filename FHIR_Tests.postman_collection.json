@@ -289,13 +289,13 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_URL_noTLS}}/Patient/77",
+									"raw": "{{base_URL_noTLS}}/Patient/100",
 									"host": [
 										"{{base_URL_noTLS}}"
 									],
 									"path": [
 										"Patient",
-										"77"
+										"100"
 									]
 								}
 							},
@@ -345,6 +345,43 @@
 									"path": [
 										"Patient",
 										"10"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "MetadataExposure",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Status Code 200 --> testing excessive data exposure for meta data. Should fail in production but it exposes the meta data here\", function () {\r",
+											"     pm.expect(pm.response.code).to.be.oneOf([200])\r",
+											" });\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "_oauth2_proxy={{oauth_cookie}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_URL_noTLS}}/metadata",
+									"host": [
+										"{{base_URL_noTLS}}"
+									],
+									"path": [
+										"metadata"
 									]
 								}
 							},
@@ -543,9 +580,23 @@
 					"name": "API6:2019 Mass Assignment",
 					"item": [
 						{
-							"name": "New Request Copy 2",
+							"name": "ResourceManipulation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											" pm.test(\"Status Code and 400 --> testing mass assignment. Should fail\", function () {\r",
+											"     pm.expect(pm.response.code).to.be.oneOf([400, 404])\r",
+											" });\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
-								"method": "GET",
+								"method": "POST",
 								"header": [
 									{
 										"key": "Cookie",
@@ -553,15 +604,26 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"resourceType\": \"Practitioner\",\r\n    \"name\":[\r\n      {\r\n          \"use\":\"official\",\r\n          \"given\":[{{patientname}}],\r\n          \"family\":\"Noori\"\r\n      }\r\n    ],\r\n    \"gender\":\"male\",\r\n    \"birthdate\":\"1994-12-09\",\r\n    \"telecom\":[\r\n        {\r\n            \"value\":\"06769616315\",\r\n            \"use\":\"mobile\",\r\n            \"system\":\"phone\"\r\n        },\r\n        {\r\n            \"system\":\"email\",\r\n            \"value\":\"{{emailaddress}}\"\r\n        }\r\n    ],\r\n    \"address\":[\r\n        {\r\n            \"line\":[\r\n                \"15,Kochgasse\"\r\n            ],\r\n            \"city\":\"Vienna\",\r\n            \"state\":\"Vienna\",\r\n            \"postalcode\":\"1080\"\r\n        }\r\n    ]\r\n\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
-									"raw": "{{base_URL}}/Patient",
+									"raw": "{{base_URL_noTLS}}/Patient/",
 									"host": [
-										"{{base_URL}}"
+										"{{base_URL_noTLS}}"
 									],
 									"path": [
-										"Patient"
+										"Patient",
+										""
 									]
-								}
+								},
+								"description": "The Patient resource tries to manipulate the attribute i.e. the request body by substituting the \"patient\" resource with \"practitioner\"."
 							},
 							"response": []
 						}
@@ -2208,7 +2270,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"resourceType\": \"Patient\",\r\n    \"name\":[\r\n      {\r\n          \"use\":\"official\",\r\n          \"given\":[{{patientname}}],\r\n          \"family\":\"Noori\"\r\n      }\r\n    ],\r\n    \"gender\":\"male\",\r\n    \"birthdate\":\"1994-12-19\",\r\n    \"telecom\":[\r\n        {\r\n            \"value\":\"06769616315\",\r\n            \"use\":\"mobile\",\r\n            \"system\":\"phone\"\r\n        },\r\n        {\r\n            \"system\":\"email\",\r\n            \"value\":\"{{emailaddress}}\"\r\n        }\r\n    ],\r\n    \"address\":[\r\n        {\r\n            \"line\":[\r\n                \"15,Kochgasse\"\r\n            ],\r\n            \"city\":\"Vienna\",\r\n            \"state\":\"Vienna\",\r\n            \"postalcode\":\"1080\"\r\n        }\r\n    ]\r\n\r\n}",
+							"raw": "{\r\n    \"resourceType\": \"Patient\",\r\n    \"name\":[\r\n      {\r\n          \"use\":\"official\",\r\n          \"given\":[{{patientname}}],\r\n          \"family\":\"Noori\"\r\n      }\r\n    ],\r\n    \"gender\":\"male\",\r\n    \"birthdate\":\"1994-12-09\",\r\n    \"telecom\":[\r\n        {\r\n            \"value\":\"06769616315\",\r\n            \"use\":\"mobile\",\r\n            \"system\":\"phone\"\r\n        },\r\n        {\r\n            \"system\":\"email\",\r\n            \"value\":\"{{emailaddress}}\"\r\n        }\r\n    ],\r\n    \"address\":[\r\n        {\r\n            \"line\":[\r\n                \"15,Kochgasse\"\r\n            ],\r\n            \"city\":\"Vienna\",\r\n            \"state\":\"Vienna\",\r\n            \"postalcode\":\"1080\"\r\n        }\r\n    ]\r\n\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2216,12 +2278,54 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_URL_noTLS}}/Patient/",
+							"raw": "{{base_URL_noTLS}}/Practitioner/",
 							"host": [
 								"{{base_URL_noTLS}}"
 							],
 							"path": [
-								"Patient",
+								"Practitioner",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create_PractitionerResource_with_different_Email_address_and_name",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let date = Date.now();\r",
+									"let name = date;\r",
+									"let email = 'ali_'+ date +'_@yahoo.com';\r",
+									"pm.environment.set('patientname',name);\r",
+									"pm.environment.set('emailaddress', email);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"resourceType\": \"Practitioner\",\r\n    \"active\":\"true\",\r\n    \"name\":[\r\n      {\r\n          \"use\":\"official\",\r\n          \"given\":\"Babo\",\r\n          \"family\":\"Babu\",\r\n          \"prefix\":\"Dr.\"\r\n      }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_URL_noTLS}}/Practitioner/",
+							"host": [
+								"{{base_URL_noTLS}}"
+							],
+							"path": [
+								"Practitioner",
 								""
 							]
 						}
