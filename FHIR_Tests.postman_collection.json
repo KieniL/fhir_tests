@@ -3,7 +3,8 @@
 		"_postman_id": "ef8d72fd-6089-4d65-a18d-ffb5edd7f032",
 		"name": "FHIR_Tests",
 		"description": "If you have a self-signed certificate like in our tests then you need to go to file/Settings/Certificates/Add Certificate to add the cert to not disable ssl verification on every request.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8127240"
 	},
 	"item": [
 		{
@@ -596,17 +597,18 @@
 								}
 							],
 							"request": {
-								"method": "POST",
+								"method": "PUT",
 								"header": [
 									{
 										"key": "Cookie",
 										"value": "_oauth2_proxy={{oauth_cookie}}",
-										"type": "text"
+										"type": "text",
+										"disabled": true
 									}
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"resourceType\": \"Practitioner\",\r\n    \"name\":[\r\n      {\r\n          \"use\":\"official\",\r\n          \"given\":[{{patientname}}],\r\n          \"family\":\"Noori\"\r\n      }\r\n    ],\r\n    \"gender\":\"male\",\r\n    \"birthdate\":\"1994-12-09\",\r\n    \"telecom\":[\r\n        {\r\n            \"value\":\"06769616315\",\r\n            \"use\":\"mobile\",\r\n            \"system\":\"phone\"\r\n        },\r\n        {\r\n            \"system\":\"email\",\r\n            \"value\":\"{{emailaddress}}\"\r\n        }\r\n    ],\r\n    \"address\":[\r\n        {\r\n            \"line\":[\r\n                \"15,Kochgasse\"\r\n            ],\r\n            \"city\":\"Vienna\",\r\n            \"state\":\"Vienna\",\r\n            \"postalcode\":\"1080\"\r\n        }\r\n    ]\r\n\r\n}",
+									"raw": "{\r\n    \"resourceType\": \"Practitioner\",\r\n    \"isAdmin\": \"true\",\r\n    \"id\": \"1\",\r\n    \"active\":\"true\",\r\n    \"name\":[\r\n      {\r\n          \"use\":\"official\",\r\n          \"given\":\"Babo\",\r\n          \"family\":\"Babu\",\r\n          \"prefix\":\"Deee\"\r\n      }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -614,13 +616,13 @@
 									}
 								},
 								"url": {
-									"raw": "{{base_URL_noTLS}}/Patient/",
+									"raw": "{{base_URL_noTLS}}/Practitioner/1",
 									"host": [
 										"{{base_URL_noTLS}}"
 									],
 									"path": [
-										"Patient",
-										""
+										"Practitioner",
+										"1"
 									]
 								},
 								"description": "The Patient resource tries to manipulate the attribute i.e. the request body by substituting the \"patient\" resource with \"practitioner\"."
